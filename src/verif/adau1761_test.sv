@@ -1,0 +1,1 @@
+../../audio_visualizer_rgb.srcs/sim_1/new/adau1761_test.sv
