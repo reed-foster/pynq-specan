@@ -5,7 +5,6 @@ module adau1761 #(
   parameter int BIT_DEPTH = 24
 )(
   input wire clk, reset,
-  input enabled,
   // i2s interface
   input         sdata_i,
   output logic  sdata_o,
@@ -46,7 +45,7 @@ always_ff @(posedge clk) begin
     adc_sample.data <= '0;
     adc_sample.valid <= 1'b0;
     dac_sample.ready <= 1'b1;
-  end else if (enabled) begin
+  end else begin
     // ready_valid logic
     if (dac_sample.ready && dac_sample.valid) begin
       // perform a transfer
@@ -81,4 +80,53 @@ always_ff @(posedge clk) begin
     end
   end
 end
+endmodule
+
+// wrapper so sv can be instantiated in verilog wrapper
+
+module adau1761_sv #(
+  parameter int BIT_DEPTH = 24
+) (
+  input clk, reset_n,
+  input enabled,
+  // i2s interface
+  input sdata_i,
+  output sdata_o,
+  input bclk,  // bit clock        (3.072MHz)
+  input lrclk, // left-right clock (48kHz)
+  // i/o dsp stream interfaces
+  // DAC interface
+  input dac_data,
+  input dac_valid,
+  output dac_ready,
+  // ADC interface
+  output adc_data,
+  output adc_valid,
+  input adc_ready
+);
+
+Axis_If #(.DWIDTH(2*BIT_DEPTH)) dac_if();
+Axis_If #(.DWIDTH(2*BIT_DEPTH)) adc_if();
+
+assign dac_if.data = dac_data;
+assign dac_if.valid = dac_valid;
+assign dac_ready = dac_if.ready;
+
+assign adc_data = adc_if.data;
+assign adc_valid = adc_if.valid;
+assign adc_if.ready = adc_ready;
+
+adau1761 #(
+  .BIT_DEPTH(BIT_DEPTH)
+) (
+  .clk(clk),
+  .reset(~reset_n),
+  .sdata_i(sdata_i),
+  .sdata_o(sdata_o),
+  .bclk(bclk),
+  .lrclk(lrclk),
+  .dac_sample(dac_if),
+  .adc_sample(adc_if)
+);
+
 endmodule

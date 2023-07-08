@@ -68,5 +68,47 @@ always_ff @(posedge clk) begin
     endcase
   end
 end
+endmodule
+
+// wrapper so sv can be instantiated in verilog wrapper
+
+module ws2812b_sv #(
+  parameter int COLOR_BITS = 24,
+  parameter int T0HI = 40,  // at 100MHz clock, 0.4us is 40 clock cycles
+  parameter int T1HI = 80,
+  parameter int T0LO = 85,
+  parameter int T1LO = 45,
+  parameter int TRES = 5500
+) (
+  input clk, reset,
+  // axis interface
+  input [COLOR_BITS-1:0] s_axis_tdata,
+  input s_axis_tvalid,
+  input s_axis_tlast,
+  output s_axis_tready,
+  // ws2812b interface
+  output dout
+);
+
+Axis_If #(.DWIDTH(COLOR_BITS)) s_axis();
+
+assign s_axis.data = s_axis_tdata;
+assign s_axis.valid = s_axis_tvalid;
+assign s_axis.last = s_axis_tlast;
+assign s_axis_tready = s_axis.ready;
+
+ws2812b #(
+  .COLOR_BITS(COLOR_BITS),
+  .T0HI(T0HI),
+  .T1HI(T1HI),
+  .T0LO(T0LO),
+  .T1LO(T1LO),
+  .TRES(TRES)
+) (
+  .clk(clk),
+  .reset(reset),
+  .din(s_axis),
+  .dout(dout)
+);
 
 endmodule
