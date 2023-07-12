@@ -96,11 +96,11 @@ module adau1761_sv #(
   input lrclk, // left-right clock (48kHz)
   // i/o dsp stream interfaces
   // DAC interface
-  input dac_data,
+  input [2*BIT_DEPTH-1] dac_data,
   input dac_valid,
   output dac_ready,
   // ADC interface
-  output adc_data,
+  output [2*BIT_DEPTH-1] adc_data,
   output adc_valid,
   input adc_ready
 );
