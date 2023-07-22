@@ -23,7 +23,7 @@ module adau1761_wrapper #(
 
 adau1761_sv #(
   .BIT_DEPTH(BIT_DEPTH)
-) (
+) adau1761_sv_i (
   .clk(clk),
   .reset(~reset_n),
   .sdata_i(sdata_i),

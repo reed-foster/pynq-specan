@@ -5,6 +5,7 @@
 *.sim/
 *.gen/
 *.srcs/sources_1/bd/
+*.srcs/sources_1/ip/
 **.swp
 *.xpr
 **.dcp

@@ -87,7 +87,7 @@ endmodule
 module adau1761_sv #(
   parameter int BIT_DEPTH = 24
 ) (
-  input clk, reset_n,
+  input clk, reset,
   input enabled,
   // i2s interface
   input sdata_i,
@@ -105,28 +105,28 @@ module adau1761_sv #(
   input adc_ready
 );
 
-Axis_If #(.DWIDTH(2*BIT_DEPTH)) dac_if();
-Axis_If #(.DWIDTH(2*BIT_DEPTH)) adc_if();
+Axis_If #(.DWIDTH(2*BIT_DEPTH)) dac_sample();
+Axis_If #(.DWIDTH(2*BIT_DEPTH)) adc_sample();
 
-assign dac_if.data = dac_data;
-assign dac_if.valid = dac_valid;
-assign dac_ready = dac_if.ready;
+assign dac_sample.data = dac_data;
+assign dac_sample.valid = dac_valid;
+assign dac_ready = dac_sample.ready;
 
-assign adc_data = adc_if.data;
-assign adc_valid = adc_if.valid;
-assign adc_if.ready = adc_ready;
+assign adc_data = adc_sample.data;
+assign adc_valid = adc_sample.valid;
+assign adc_sample.ready = adc_ready;
 
 adau1761 #(
   .BIT_DEPTH(BIT_DEPTH)
-) (
-  .clk(clk),
-  .reset(~reset_n),
-  .sdata_i(sdata_i),
-  .sdata_o(sdata_o),
-  .bclk(bclk),
-  .lrclk(lrclk),
-  .dac_sample(dac_if),
-  .adc_sample(adc_if)
+) adau1761_i (
+  .clk,
+  .reset,
+  .sdata_i,
+  .sdata_o,
+  .bclk,
+  .lrclk,
+  .dac_sample,
+  .adc_sample
 );
 
 endmodule

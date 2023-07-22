@@ -26,7 +26,7 @@ ws2812b_sv #(
   .T0LO(T0LO),
   .T1LO(T1LO),
   .TRES(TRES)
-) (
+) ws2812b_sv_i (
   .clk(clk),
   .reset(~reset_n),
   .s_axis_tdata(s_axis_tdata),

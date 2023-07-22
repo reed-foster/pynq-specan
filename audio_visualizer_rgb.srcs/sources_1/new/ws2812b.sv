@@ -90,12 +90,12 @@ module ws2812b_sv #(
   output dout
 );
 
-Axis_If #(.DWIDTH(COLOR_BITS)) s_axis();
+Axis_If #(.DWIDTH(COLOR_BITS)) din();
 
-assign s_axis.data = s_axis_tdata;
-assign s_axis.valid = s_axis_tvalid;
-assign s_axis.last = s_axis_tlast;
-assign s_axis_tready = s_axis.ready;
+assign din.data = s_axis_tdata;
+assign din.valid = s_axis_tvalid;
+assign din.last = s_axis_tlast;
+assign s_axis_tready = din.ready;
 
 ws2812b #(
   .COLOR_BITS(COLOR_BITS),
@@ -104,11 +104,11 @@ ws2812b #(
   .T0LO(T0LO),
   .T1LO(T1LO),
   .TRES(TRES)
-) (
-  .clk(clk),
-  .reset(reset),
-  .din(s_axis),
-  .dout(dout)
+) ws2812b_i (
+  .clk,
+  .reset,
+  .din,
+  .dout
 );
 
 endmodule
